@@ -1,0 +1,39 @@
+# deamon off is imporant to keep the docker container running
+daemon off;
+
+user www-data;
+worker_processes  4;
+
+error_log  <%= @settings.internal_logs_path %>/error.log warn;
+pid        /var/run/nginx.pid;
+
+events {
+  worker_connections  2048;
+}
+
+http {
+  include     <%= @settings.internal_conf_path %>/mime.types;
+  default_type  application/octet-stream;
+
+  access_log	<%= @settings.internal_logs_path %>/access.log;
+
+  sendfile on;
+  tcp_nopush on;
+  tcp_nodelay on;
+
+  keepalive_timeout  65;
+
+  gzip  on;
+  gzip_http_version 1.0;
+  gzip_comp_level 2;
+  gzip_proxied any;
+  gzip_types text/plain text/html text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+  server_names_hash_bucket_size 64;
+  types_hash_max_size 2048;
+  types_hash_bucket_size 64;
+
+
+  include <%= @settings.internal_conf_path %>/conf.d/*.conf;
+  include <%= @settings.internal_sites_enabled_path %>/*;
+}
