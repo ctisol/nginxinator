@@ -1,5 +1,5 @@
 upstream unicorn {
-  server unix:/var/run/unicorn/unicorn.socket fail_timeout=0;
+  server unix:<%= @settings.internal_sock_path %>/unicorn.socket fail_timeout=0;
 }
 
 
