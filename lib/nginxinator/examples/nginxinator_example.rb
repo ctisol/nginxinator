@@ -59,10 +59,6 @@ class NginxInstance
       "/var/log/nginx"
     end
 
-    def internal_sock_path
-      "/var/run/unicorn"
-    end
-
     def ssh_user
       ENV["USER"]
     end
@@ -80,10 +76,6 @@ class NginxInstance
     "#{external_conf_path}/sites-enabled"
   end
 
-  def external_sock_path
-    "#{external_conf_path}/run"
-  end
-
   def container_name
     "#{domain}-nginx-#{publish_ports.collect { |p| p['external'] }.join('-')}"
   end
@@ -97,7 +89,6 @@ class NginxInstance
       "--name",   container_name,
       "--volume", "#{external_data_path}:#{internal_data_path}:rw",
       "--volume", "#{external_conf_path}:#{internal_conf_path}:rw",
-      "--volume", "#{external_sock_path}:#{internal_sock_path}:rw",
       "--volume", "#{external_logs_path}:#{internal_logs_path}:rw",
       ports_options,
       image_name
