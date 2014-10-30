@@ -11,7 +11,7 @@ namespace :nginx do
     run_locally do
       execute "mkdir -p templates/nginx/sites-enabled"
       {
-        'Dockerfile'                        => 'Dockerfile_example',
+        'examples/Dockerfile'               => 'Dockerfile_example',
         'examples/nginxinator_example.rb'   => 'nginxinator_example.rb',
         'examples/nginx_example.conf.erb'   => 'templates/nginx/nginx_example.conf.erb',
         'examples/site-enabled_example.erb' => 'templates/nginx/sites-enabled/client-app_example.erb',
