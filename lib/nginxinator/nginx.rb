@@ -22,7 +22,7 @@ namespace :nginx do
     on "#{settings.ssh_user}@#{settings.domain}" do
       config_file_changed = false
       settings.config_files.each do |config_file|
-        if config_file_differs?(settings, settings.local_templates_path, settings.external_conf_path, config_file)
+        if nginx_config_file_differs?(settings, settings.local_templates_path, settings.external_conf_path, config_file)
           warn "Config file #{config_file} on #{settings.domain} is being updated."
           Rake::Task['nginx:install_config_file'].invoke(settings.local_templates_path, settings.external_conf_path, config_file)
           Rake::Task['nginx:install_config_file'].reenable
@@ -30,17 +30,17 @@ namespace :nginx do
         end
       end
       settings.sites_enabled.each do |config_file|
-        if config_file_differs?(settings, settings.local_site_templates_path, settings.external_sites_enabled_path, config_file)
+        if nginx_config_file_differs?(settings, settings.local_site_templates_path, settings.external_sites_enabled_path, config_file)
           warn "Config file #{config_file} on #{settings.domain} is being updated."
           Rake::Task['nginx:install_config_file'].invoke(settings.local_site_templates_path, settings.external_sites_enabled_path, config_file)
           Rake::Task['nginx:install_config_file'].reenable
           config_file_changed = true
         end
       end
-      unless container_exists?(settings.container_name)
+      unless nginx_container_exists?(settings.container_name)
         Rake::Task['nginx:create_container'].invoke
       else
-        unless container_is_running?(settings.container_name)
+        unless nginx_container_is_running?(settings.container_name)
           Rake::Task['nginx:start_container'].invoke
         else
           if config_file_changed
@@ -58,10 +58,10 @@ namespace :nginx do
     settings = @settings
     on "#{settings.ssh_user}@#{settings.domain}" do
       info ""
-      if container_exists?(settings.container_name)
+      if nginx_container_exists?(settings.container_name)
         info "#{settings.container_name} exists on #{settings.domain}"
         info ""
-        if container_is_running?(settings.container_name)
+        if nginx_container_is_running?(settings.container_name)
           info "#{settings.container_name} is running on #{settings.domain}"
           info ""
         else
@@ -81,7 +81,7 @@ namespace :nginx do
       warn "Starting a new container named #{settings.container_name} on #{settings.domain}"
       execute("docker", "run", settings.docker_run_command)
       sleep 2
-      fatal stay_running_message(settings) and raise unless container_is_running?(settings.container_name)
+      fatal nginx_stay_running_message(settings) and raise unless nginx_container_is_running?(settings.container_name)
     end
   end
 
@@ -91,7 +91,7 @@ namespace :nginx do
       warn "Starting an existing but non-running container named #{settings.container_name}"
       execute("docker", "start", settings.container_name)
       sleep 2
-      fatal stay_running_message(settings) and raise unless container_is_running?(settings.container_name)
+      fatal nginx_stay_running_message(settings) and raise unless nginx_container_is_running?(settings.container_name)
     end
   end
 
@@ -101,7 +101,7 @@ namespace :nginx do
       warn "Restarting a running container named #{settings.container_name}"
       execute("docker", "restart", settings.container_name)
       sleep 2
-      fatal stay_running_message(settings) and raise unless container_is_running?(settings.container_name)
+      fatal nginx_stay_running_message(settings) and raise unless nginx_container_is_running?(settings.container_name)
     end
   end
 
@@ -122,7 +122,7 @@ namespace :nginx do
     on "#{settings.ssh_user}@#{settings.domain}" do
       as 'root' do
         execute("mkdir", "-p", args.config_path) unless test("test", "-d", args.config_path)
-        generated_config_file = generate_config_file(settings, "#{args.template_path}/#{args.config_file}.erb")
+        generated_config_file = nginx_generate_config_file(settings, "#{args.template_path}/#{args.config_file}.erb")
         upload! StringIO.new(generated_config_file), "/tmp/#{args.config_file}"
         execute("mv", "/tmp/#{args.config_file}", "#{args.config_path}/#{args.config_file}")
         execute("chown", "-R", "root:root", args.config_path)
@@ -146,15 +146,18 @@ namespace :nginx do
 
   private
 
-    def stay_running_message(settings)
+    # Temporarily added 'nginx_' to the beginning of each of these methods to avoid
+    #   getting them overwritten by other gems with methods with the same names, (E.G. postgresinator.)
+    ## TODO Figure out how to do this the right or better way.
+    def nginx_stay_running_message(settings)
       "Container #{settings.container_name} on #{settings.domain} did not stay running more than 2 seconds"
     end
 
-    def config_file_differs?(settings, local_templates_path, external_config_path, config_file)
-      generated_config_file = generate_config_file(settings, "#{local_templates_path}/#{config_file}.erb")
+    def nginx_config_file_differs?(settings, local_templates_path, external_config_path, config_file)
+      generated_config_file = nginx_generate_config_file(settings, "#{local_templates_path}/#{config_file}.erb")
       as 'root' do
         config_file_path = "#{external_config_path}/#{config_file}"
-        if file_exists?(config_file_path)
+        if nginx_file_exists?(config_file_path)
           capture("cat", config_file_path).chomp != generated_config_file.chomp
         else
           true
@@ -162,23 +165,23 @@ namespace :nginx do
       end
     end
 
-    def generate_config_file(settings, template_file_path)
+    def nginx_generate_config_file(settings, template_file_path)
       @settings     = settings # needed for ERB
       template_path = File.expand_path(template_file_path)
       ERB.new(File.new(template_path).read).result(binding)
     end
 
-    def container_exists?(container_name)
+    def nginx_container_exists?(container_name)
       test "docker", "inspect", container_name, ">", "/dev/null"
     end
 
-    def container_is_running?(container_name)
+    def nginx_container_is_running?(container_name)
       (capture "docker", "inspect",
         "--format='{{.State.Running}}'",
         container_name).strip == "true"
     end
 
-    def file_exists?(file_name_path)
+    def nginx_file_exists?(file_name_path)
       test "[", "-f", file_name_path, "]"
     end
 
