@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'nginxinator'
-  s.version     = '0.0.1'
-  s.date        = '2014-10-29'
+  s.version     = '0.0.0'
+  s.date        = '2014-10-16'
   s.summary     = "Deploy Nginx"
   s.description = "An Opinionated Nginx Deployment gem"
   s.authors     = ["david amick"]
@@ -9,7 +9,6 @@ Gem::Specification.new do |s|
   s.files       = [
     "lib/nginxinator.rb",
     "lib/nginxinator/nginx.rb",
-    "lib/nginxinator/nginxinator.rb",
     "lib/nginxinator/config.rb",
     "lib/nginxinator/examples/nginxinator_example.rb",
     "lib/nginxinator/examples/nginx_example.conf.erb",
