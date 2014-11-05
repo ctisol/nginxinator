@@ -99,6 +99,7 @@ class NginxInstance
       "--volume", "#{external_conf_path}:#{internal_conf_path}:rw",
       "--volume", "#{external_sock_path}:#{internal_sock_path}:rw",
       "--volume", "#{external_logs_path}:#{internal_logs_path}:rw",
+      "--restart", "always",
       ports_options,
       image_name
     ].flatten
