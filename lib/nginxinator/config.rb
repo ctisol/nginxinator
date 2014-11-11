@@ -1,23 +1,21 @@
-namespace :nginx do
-
-  task :ensure_setup do |t, args|
-    @settings = NginxInstance.new
-    # use 'rake nginx:COMMAND debug=true' for debugging (you can also add --trace if you like)
-    SSHKit.config.output_verbosity = Logger::DEBUG if ENV['debug'] == "true"
-  end
+namespace :nginxinator do
 
   desc 'Write example config files'
   task :write_example_configs do
     run_locally do
-      execute "mkdir -p templates/nginx/sites-enabled"
+      execute "mkdir -p config/deploy templates/nginx/sites-enabled"
       {
-        'examples/Dockerfile'               => 'Dockerfile_example',
-        'examples/nginxinator_example.rb'   => 'nginxinator_example.rb',
-        'examples/nginx_example.conf.erb'   => 'templates/nginx/nginx_example.conf.erb',
-        'examples/site-enabled_example.erb' => 'templates/nginx/sites-enabled/client-app_example.erb',
-        'examples/ssl.crt_example.erb'      => 'templates/nginx/ssl.crt_example.erb',
-        'examples/ssl.key_example.erb'      => 'templates/nginx/ssl.key_example.erb',
-        'examples/mime.types_example.erb'   => 'templates/nginx/mime.types_example.erb'
+        'examples/Capfile'                              => 'Capfile_example',
+        'examples/config/deploy.rb'                     => 'config/deploy_example.rb',
+        'examples/config/deploy_nginxinator.rb'         => 'config/deploy_nginxinator_example.rb',
+        'examples/config/deploy/staging.rb'             => 'config/deploy/staging_example.rb',
+        'examples/config/deploy/staging_nginxinator.rb' => 'config/deploy/staging_nginxinator_example.rb',
+        'examples/Dockerfile'                           => 'templates/nginx/Dockerfile_example',
+        'examples/nginx.conf.erb'                       => 'templates/nginx/nginx_example.conf.erb',
+        'examples/site-enabled.erb'                     => 'templates/nginx/sites-enabled/client-app_example.erb',
+        'examples/ssl.crt.erb'                          => 'templates/nginx/ssl.crt_example.erb',
+        'examples/ssl.key.erb'                          => 'templates/nginx/ssl.key_example.erb',
+        'examples/mime.types.erb'                       => 'templates/nginx/mime.types_example.erb'
       }.each do |source, destination|
         config = File.read(File.dirname(__FILE__) + "/#{source}")
         File.open("./#{destination}", 'w') { |f| f.write(config) }

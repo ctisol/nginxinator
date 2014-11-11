@@ -4,7 +4,7 @@ daemon off;
 user www-data;
 worker_processes  4;
 
-error_log  <%= @settings.internal_logs_path %>/error.log warn;
+error_log  <%= @internal_logs_path %>/error.log warn;
 pid        /var/run/nginx.pid;
 
 events {
@@ -12,10 +12,10 @@ events {
 }
 
 http {
-  include     <%= @settings.internal_conf_path %>/mime.types;
+  include     <%= @internal_conf_path %>/mime.types;
   default_type  application/octet-stream;
 
-  access_log	<%= @settings.internal_logs_path %>/access.log;
+  access_log	<%= @internal_logs_path %>/access.log;
 
   sendfile on;
   tcp_nopush on;
@@ -34,6 +34,6 @@ http {
   types_hash_bucket_size 64;
 
 
-  include <%= @settings.internal_conf_path %>/conf.d/*.conf;
-  include <%= @settings.internal_sites_enabled_path %>/*;
+  include <%= @internal_conf_path %>/conf.d/*.conf;
+  include <%= @internal_sites_enabled_path %>/*;
 }

@@ -1,25 +1,25 @@
 upstream unicorn {
-  server unix:<%= @settings.internal_sock_path %>/unicorn.socket fail_timeout=0;
+  server unix:<%= @internal_sock_path %>/unicorn.socket fail_timeout=0;
 }
 
 
 server {
   listen 80;
   location / {
-    rewrite ^/(.*)$ https://<%= @settings.domain %>/$1 redirect;
+    rewrite ^/(.*)$ https://<%= @domain %>/$1 redirect;
   }
 }
 
 server {
   listen 443;
-  set $public_root <%= @settings.internal_data_path %>/public;
-  set $rails_root <%= @settings.internal_data_path %>;
+  set $public_root <%= @internal_data_path %>/public;
+  set $rails_root <%= @internal_data_path %>;
 
   root $public_root;
 
   ssl on;
-  ssl_certificate <%= @settings.internal_conf_path %>/ssl.crt;
-  ssl_certificate_key <%= @settings.internal_conf_path %>/ssl.key;
+  ssl_certificate <%= @internal_conf_path %>/ssl.crt;
+  ssl_certificate_key <%= @internal_conf_path %>/ssl.key;
   ssl_ciphers HIGH;
   ssl_protocols SSLv3 TLSv1;
   ssl_prefer_server_ciphers on;
