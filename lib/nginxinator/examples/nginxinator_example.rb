@@ -28,11 +28,11 @@ class NginxInstance
     end
 
     def external_data_path
-      "/var/www/current"
+      "/var/www/client-app/current"
     end
 
     def external_logs_path
-      "/var/log/nginx"
+      "/var/www/client-app/shared/log/nginx"
     end
 
 

@@ -2,7 +2,7 @@ namespace :nginx do
 
   task :ensure_setup do |t, args|
     @settings = NginxInstance.new
-    # use 'rake pg:COMMAND debug=true' for debugging (you can also add --trace if you like)
+    # use 'rake nginx:COMMAND debug=true' for debugging (you can also add --trace if you like)
     SSHKit.config.output_verbosity = Logger::DEBUG if ENV['debug'] == "true"
   end
 
