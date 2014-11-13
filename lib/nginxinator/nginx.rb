@@ -114,8 +114,8 @@ namespace :nginx do
       as 'root' do
         execute("mkdir", "-p", args.config_path) unless test("test", "-d", args.config_path)
         generated_config_file = nginx_generate_config_file("#{args.template_path}/#{args.config_file}.erb")
-        upload! StringIO.new(generated_config_file), "/tmp/#{args.config_file}"
-        execute("mv", "/tmp/#{args.config_file}", "#{args.config_path}/#{args.config_file}")
+        upload! StringIO.new(generated_config_file), "/tmp/#{args.config_file}.file"
+        execute("mv", "/tmp/#{args.config_file}.file", "#{args.config_path}/#{args.config_file}")
         execute("chown", "-R", "root:root", args.config_path)
         execute("chmod", "-R", "700", args.config_path)
       end

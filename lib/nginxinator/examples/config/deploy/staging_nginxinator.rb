@@ -26,16 +26,16 @@ set :internal_conf_path,          "/etc/nginx"
 set :internal_sites_enabled_path, "/etc/nginx/sites-enabled"
 set :internal_logs_path,          "/var/log/nginx"
 set :internal_sock_path,          "/var/run/unicorn"
-set :ssh_user,                    ENV["USER"]
+set :ssh_user,                    -> { ENV["USER"] }
 
 
 
 ## The values below are not meant to be changed and shouldn't
 ##  need to be under the majority of circumstances:
-set :nginx_container_name,        "#{fetch(:domain)}-nginx-#{fetch(:publish_ports).collect { |p| p['external'] }.join('-')}"
-set :external_conf_path,          "/#{fetch(:nginx_container_name)}-conf"
-set :external_sites_enabled_path, "#{fetch(:external_conf_path)}/sites-enabled"
-set :external_sock_path,          "#{fetch(:external_conf_path)}/run"
+set :nginx_container_name,        -> { "#{fetch(:domain)}-nginx-#{fetch(:publish_ports).collect { |p| p['external'] }.join('-')}" }
+set :external_conf_path,          -> { "/#{fetch(:nginx_container_name)}-conf" }
+set :external_sites_enabled_path, -> { "#{fetch(:external_conf_path)}/sites-enabled" }
+set :external_sock_path,          -> { "#{fetch(:external_conf_path)}/run" }
 set :ports_options,               -> {
   options = []
   fetch(:publish_ports).each do |port_set|

@@ -3,7 +3,7 @@ namespace :nginxinator do
   desc 'Write example config files'
   task :write_example_configs do
     run_locally do
-      execute "mkdir -p config/deploy templates/nginx/sites-enabled"
+      execute "mkdir", "-p", "config/deploy", "templates/nginx/sites-enabled"
       {
         'examples/Capfile'                              => 'Capfile_example',
         'examples/config/deploy.rb'                     => 'config/deploy_example.rb',
