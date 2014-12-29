@@ -1,21 +1,21 @@
 # deamon off is imporant to keep the docker container running
 daemon off;
 
-user www-data;
+user <%= fetch(:webserver_username) %>;
 worker_processes  4;
 
-error_log  <%= @internal_logs_path %>/error.log warn;
-pid        /var/run/nginx.pid;
+error_log  <%= fetch(:webserver_logs_path) %>/error.log warn;
+pid        <%= fetch(:webserver_socket_path) %>/nginx.pid;
 
 events {
   worker_connections  2048;
 }
 
 http {
-  include     <%= @internal_conf_path %>/mime.types;
+  include     <%= fetch(:webserver_config_path) %>/mime.types;
   default_type  application/octet-stream;
 
-  access_log	<%= @internal_logs_path %>/access.log;
+  access_log	<%= fetch(:webserver_logs_path) %>/access.log;
 
   sendfile on;
   tcp_nopush on;
@@ -27,13 +27,86 @@ http {
   gzip_http_version 1.0;
   gzip_comp_level 2;
   gzip_proxied any;
-  gzip_types text/plain text/html text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+  gzip_types text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
   server_names_hash_bucket_size 64;
   types_hash_max_size 2048;
   types_hash_bucket_size 64;
 
 
-  include <%= @internal_conf_path %>/conf.d/*.conf;
-  include <%= @internal_sites_enabled_path %>/*;
+  upstream unicorn {
+    server unix:<%= fetch(:webserver_socket_path) %>/unicorn.socket fail_timeout=0;
+  }
+
+  server {
+    listen 80;
+    location / {
+      rewrite ^/(.*)$ https://<%= fetch(:domain) %>/$1 redirect;
+    }
+  }
+
+  server {
+    listen 443;
+    set $public_root  <%= fetch(:webserver_data_path) %>/public;
+    set $rails_root   <%= fetch(:webserver_data_path) %>;
+
+    root $public_root;
+
+    ssl on;
+    ssl_certificate     <%= fetch(:webserver_config_path) %>/ssl.crt;
+    ssl_certificate_key <%= fetch(:webserver_config_path) %>/ssl.key;
+    ssl_ciphers HIGH;
+    ssl_protocols SSLv3 TLSv1;
+    ssl_prefer_server_ciphers on;
+
+    if (-f $document_root/system/maintenance.html) {
+      rewrite  ^(.*)$  /system/maintenance.html last;
+      break;
+    }
+
+    location / {
+      client_max_body_size 4096M;
+      proxy_read_timeout 900;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+      proxy_max_temp_file_size 0;
+      proxy_set_header X-Sendfile-Type X-Accel-Redirect;
+      proxy_set_header X-Accel-Remote-Mapping webdav_redirect;
+      proxy_set_header X-Accel-Mapping $rails_root=$rails_root;
+
+      if (-f $request_filename) {
+        expires max;
+        break;
+      }
+
+      if (!-f $request_filename) {
+        proxy_pass http://unicorn;
+        break;
+      }
+    }
+
+    location ~ /files/(.*) {
+      alias $rails_root/$1;
+      internal;
+    }
+
+    location ~* /webdav_redirect {
+      internal;
+      resolver 127.0.0.1;
+      set $r_host $upstream_http_redirect_host;
+      set $r_url $upstream_http_redirect_url;
+      proxy_set_header Authorization '';
+      proxy_set_header Host $r_host;
+      proxy_max_temp_file_size 0;
+      proxy_pass $r_url;
+    }
+
+    error_page 500 502 503 504  /500.html;
+    location = /500.html {
+      root $public_root;
+    }
+  }
 }
