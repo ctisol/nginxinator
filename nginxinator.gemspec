@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name        = 'nginxinator'
-  s.version     = '0.2.0'
-  s.date        = '2014-12-29'
+  s.version     = '0.2.1'
+  s.date        = '2015-01-17'
   s.summary     = "Deploy Nginx"
-  s.description = "An Opinionated Nginx Deployment gem"
+  s.description = "Deploy Nginx instances using Capistrano and Docker"
   s.authors     = ["david amick"]
   s.email       = "davidamick@ctisolutionsinc.com"
   s.files       = [
@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
     "lib/nginxinator/nginx.rb",
     "lib/nginxinator/config.rb",
     "lib/nginxinator/check.rb",
+    "lib/nginxinator/built-in.rb",
     "lib/nginxinator/examples/Capfile",
     "lib/nginxinator/examples/config/deploy.rb",
     "lib/nginxinator/examples/config/deploy/staging.rb",
@@ -21,11 +22,11 @@ Gem::Specification.new do |s|
     "lib/nginxinator/examples/Dockerfile"
   ]
   s.required_ruby_version  =                '>= 1.9.3'
-  s.requirements           <<               "Docker ~1.3.1"
-  s.add_runtime_dependency 'capistrano',    '= 3.2.1'
-  s.add_runtime_dependency 'deployinator',  '~> 0.1.0'
-  s.add_runtime_dependency 'rake',          '= 10.3.2'
-  s.add_runtime_dependency 'sshkit',        '= 1.5.1'
+  s.requirements           <<               "Docker ~> 1.3.1"
+  s.add_runtime_dependency 'capistrano',    '~> 3.2.1'
+  s.add_runtime_dependency 'deployinator',  '~> 0.1.3'
+  s.add_runtime_dependency 'rake',          '~> 10.3.2'
+  s.add_runtime_dependency 'sshkit',        '~> 1.5.1'
   s.homepage    =
     'https://github.com/snarlysodboxer/nginxinator'
   s.license     = 'GNU'
