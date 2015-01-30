@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'nginxinator'
-  s.version     = '0.2.1'
-  s.date        = '2015-01-17'
+  s.version     = '0.2.2'
+  s.date        = '2015-01-30'
   s.summary     = "Deploy Nginx"
   s.description = "Deploy Nginx instances using Capistrano and Docker"
   s.authors     = ["david amick"]
