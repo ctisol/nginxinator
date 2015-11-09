@@ -1,4 +1,3 @@
-set :webserver_log_level,           "info"
 set :webserver_config_files,        ["nginx.conf", "ssl.crt", "ssl.key", "mime.types"]
 set :webserver_logs_path,           -> { shared_path.join('log') }
 set :webserver_config_path,         -> { shared_path.join('nginx') }

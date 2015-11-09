@@ -1,7 +1,6 @@
 namespace :nginx do
 
   task :ensure_setup => ['nginxinator:deployment_user', 'nginxinator:webserver_user', 'deployinator:sshkit_umask'] do
-    SSHKit.config.output_verbosity = fetch(:webserver_log_level)
   end
 
   desc "Idempotently setup an Nginx instance."

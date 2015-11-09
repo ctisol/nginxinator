@@ -31,4 +31,3 @@ You need to manually verify you are not attempting to setup more than one instan
 ###### TODO
 * Rename log files to contain "nginx-"
 * Create force restart to remove and restart container
-* Remove logging hack
