@@ -55,7 +55,7 @@ namespace :nginx do
   end
 
   task :install_config_files => [:ensure_setup] do
-    require 'erb' unless defined?(ERB)
+    require 'erb'
     on roles(:app) do
       as 'root' do
         execute "mkdir", "-p", fetch(:webserver_socket_path),
