@@ -31,3 +31,6 @@ You need to manually verify you are not attempting to setup more than one instan
 ###### TODO
 * Rename log files to contain "nginx-"
 * Create force restart to remove and restart container
+* Change the default nginx.conf.erb to use try_files instead of (-f <filename>) https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/#check-if-file-exists
+* Add a 'non-interactive=true' switch to all interactive questions
+* Use a lock file to auto-detect when docker run commands have changed, - and recreate containers instead of restarting them.

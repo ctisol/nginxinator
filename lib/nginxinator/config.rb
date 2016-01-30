@@ -14,9 +14,8 @@ end
 namespace :nginxinator do
 
   set :example, "_example"
-
   desc "Write example config files (with '_example' appended to their names)."
-  task :write_example_configs do
+  task :write_example_configs => 'deployinator:load_settings' do
     run_locally do
       execute "mkdir", "-p", "config/deploy", fetch(:webserver_templates_path, 'templates/nginx')
       {
@@ -41,14 +40,14 @@ namespace :nginxinator do
 
   desc 'Write example config files (will overwrite any existing config files).'
   namespace :write_example_configs do
-    task :in_place do
+    task :in_place => 'deployinator:load_settings' do
       set :example, ""
       Rake::Task['nginxinator:write_example_configs'].invoke
     end
   end
 
   desc 'Write a file showing the built-in overridable settings.'
-  task :write_built_in do
+  task :write_built_in => 'deployinator:load_settings' do
     run_locally do
       {
         'built-in.rb'                         => 'built-in.rb',
@@ -64,7 +63,7 @@ namespace :nginxinator do
   # These are the only two tasks using :preexisting_ssh_user
   namespace :deployment_user do
     #desc "Setup or re-setup the deployment user, idempotently"
-    task :setup do
+    task :setup => 'deployinator:load_settings' do
       on roles(:all) do |h|
         on "#{fetch(:preexisting_ssh_user)}@#{h}" do |host|
           as :root do
@@ -77,7 +76,7 @@ namespace :nginxinator do
     end
   end
 
-  task :deployment_user do
+  task :deployment_user => 'deployinator:load_settings' do
     on roles(:all) do |h|
       on "#{fetch(:preexisting_ssh_user)}@#{h}" do |host|
         as :root do
@@ -91,7 +90,7 @@ namespace :nginxinator do
     end
   end
 
-  task :webserver_user do
+  task :webserver_user => 'deployinator:load_settings' do
     on roles(:app) do
       as :root do
         unix_user_add(fetch(:webserver_username)) unless unix_user_exists?(fetch(:webserver_username))
@@ -99,7 +98,7 @@ namespace :nginxinator do
     end
   end
 
-  task :file_permissions => [:deployment_user, :webserver_user] do
+  task :file_permissions => ['deployinator:load_settings', :deployment_user, :webserver_user] do
     on roles(:app) do
       as :root do
         setup_file_permissions

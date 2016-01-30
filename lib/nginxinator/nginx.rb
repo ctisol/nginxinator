@@ -1,6 +1,6 @@
 namespace :nginx do
 
-  task :ensure_setup => ['nginxinator:deployment_user', 'nginxinator:webserver_user', 'deployinator:sshkit_umask'] do
+  task :ensure_setup => ['deployinator:load_settings', 'nginxinator:deployment_user', 'nginxinator:webserver_user', 'deployinator:sshkit_umask'] do
   end
 
   desc "Idempotently setup an Nginx instance."
