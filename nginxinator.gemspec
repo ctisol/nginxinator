@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.date        = '2015-01-30'
   s.summary     = "Deploy Nginx"
   s.description = "Deploy Nginx instances using Capistrano and Docker"
-  s.authors     = ["david amick"]
-  s.email       = "davidamick@ctisolutionsinc.com"
+  s.authors     = ["Kishore", "Dhanesh"]
+  s.email       = "kishore@railsfactory.com"
   s.files       = [
     "lib/nginxinator.rb",
     "lib/nginxinator/nginx.rb",
@@ -24,10 +24,10 @@ Gem::Specification.new do |s|
   s.required_ruby_version  =                '>= 1.9.3'
   s.requirements           <<               "Docker ~> 1.3.1"
   s.add_runtime_dependency 'capistrano',    '~> 3.2.1'
-  s.add_runtime_dependency 'deployinator',  '~> 0.2.0'
+  s.add_runtime_dependency 'deployinator'
   s.add_runtime_dependency 'rake',          '~> 10.3.2'
   s.add_runtime_dependency 'sshkit',        '~> 1.5.1'
   s.homepage    =
-    'https://github.com/snarlysodboxer/nginxinator'
+    'https://github.com/ctisol/nginxinator'
   s.license     = 'GNU'
 end
